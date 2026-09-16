@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="plugin" group="content" method="upgrade">
+  <name>plg_content_rojacomments</name>
+  <version>1.0.0</version>
+  <author>ROJA Portal</author>
+  <description>Injects native ROJA Comments into Joomla article pages.</description>
+  <files>
+    <filename plugin="rojacomments">rojacomments.php</filename>
+    <folder>media</folder>
+  </files>
+  <config><fields name="params"><fieldset name="basic">
+    <field name="enabled" type="radio" default="1" label="Enable ROJA Comments"><option value="0">JNO</option><option value="1">JYES</option></field>
+    <field name="guest_comments" type="radio" default="0" label="Allow guest comments"><option value="0">JNO</option><option value="1">JYES</option></field>
+    <field name="max_length" type="number" default="2000" min="100" max="10000" label="Maximum comment characters" />
+    <field name="max_depth" type="number" default="2" min="1" max="5" label="Maximum reply depth" />
+  </fieldset></fields></config>
+</extension>

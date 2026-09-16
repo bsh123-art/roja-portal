@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<config>
+  <fieldset name="basic" label="ROJA Comments">
+    <field name="guest_comments" type="radio" default="0" label="Allow guest comments"><option value="0">JNO</option><option value="1">JYES</option></field>
+    <field name="max_length" type="number" default="2000" min="100" max="10000" label="Maximum comment characters" />
+    <field name="max_depth" type="number" default="2" min="1" max="5" label="Maximum reply depth" />
+  </fieldset>
+</config>

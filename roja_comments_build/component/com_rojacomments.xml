@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="component" method="upgrade">
+  <name>com_rojacomments</name>
+  <version>1.0.0</version>
+  <author>ROJA Portal</author>
+  <description>Native ROJA Comments component, API, and moderation.</description>
+  <namespace path="src">Roja\Component\Rojacomments</namespace>
+  <administration>
+    <menu>ROJA Comments</menu>
+    <files folder="admin">
+      <filename>access.xml</filename>
+      <filename>config.xml</filename>
+      <filename>services.php</filename>
+      <folder>src</folder>
+      <folder>sql</folder>
+    </files>
+  </administration>
+  <files folder="site">
+    <filename>services.php</filename>
+    <folder>src</folder>
+  </files>
+  <media destination="com_rojacomments" folder="media">
+    <folder>js</folder>
+    <folder>css</folder>
+  </media>
+  <install>
+    <sql><file driver="mysql" charset="utf8">sql/install.mysql.utf8.sql</file></sql>
+  </install>
+  <uninstall>
+    <sql><file driver="mysql" charset="utf8">sql/uninstall.mysql.utf8.sql</file></sql>
+  </uninstall>
+</extension>

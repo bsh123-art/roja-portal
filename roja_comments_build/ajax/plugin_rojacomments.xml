@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="plugin" group="ajax" method="upgrade">
+  <name>plg_ajax_rojacomments</name>
+  <version>1.0.0</version>
+  <author>ROJA Portal</author>
+  <description>AJAX API for native ROJA Comments.</description>
+  <files>
+    <filename plugin="rojacomments">rojacomments.php</filename>
+  </files>
+</extension>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="package" method="upgrade">
+  <name>pkg_roja_comments</name>
+  <packagename>roja_comments</packagename>
+  <version>1.0.0</version>
+  <creationDate>September 2026</creationDate>
+  <author>ROJA Portal</author>
+  <description>Native ROJA Comments for Joomla articles.</description>
+  <files folder="packages">
+    <file type="component" id="com_rojacomments">com_rojacomments.zip</file>
+    <file type="plugin" id="rojacomments" group="content">plg_content_rojacomments.zip</file>
+    <file type="plugin" id="rojacomments" group="ajax">plg_ajax_rojacomments.zip</file>
+  </files>
+</extension>

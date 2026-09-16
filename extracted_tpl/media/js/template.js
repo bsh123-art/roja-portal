@@ -8,6 +8,71 @@
       list.setAttribute('aria-label', breakingLabel);
     }
   });
+
+  document.querySelectorAll('.rp-article-tools').forEach(tools => {
+    const article = tools.closest('.com-content-article') || document.querySelector('.com-content-article');
+    const info = article?.querySelector('.article-info.text-muted, .article-info');
+    if (!article || !info || tools.dataset.bound) return;
+    tools.dataset.bound = '1';
+    info.insertAdjacentElement('afterend', tools);
+    const body = article.querySelector('.com-content-article__body');
+    const listen = tools.querySelector('.rp-article-listen');
+    const share = tools.querySelector('.rp-article-share');
+    const save = tools.querySelector('.rp-article-save');
+    const comments = tools.querySelector('.rp-article-comments');
+    const commentsPanel = document.getElementById('rp-comments');
+    const commentsLoader = commentsPanel?.querySelector('.rp-comments-load');
+    if (comments && (!commentsPanel || !commentsLoader)) {
+      comments.hidden = true;
+      comments.setAttribute('aria-disabled', 'true');
+    }
+    const storageKey = `roja-saved-article-${location.pathname}`;
+    const indonesiaVoice = () => window.speechSynthesis.getVoices().find(voice => {
+      const language = voice.lang.toLowerCase().replace('_', '-');
+      return language === 'id-id' || language.startsWith('id-');
+    });
+    const saved = localStorage.getItem(storageKey) === '1';
+    save?.setAttribute('aria-checked', String(saved));
+    save?.classList.toggle('is-saved', saved);
+    listen?.addEventListener('click', () => {
+      if (!body || !('speechSynthesis' in window)) return;
+      if (speechSynthesis.speaking) {
+        speechSynthesis.cancel();
+        listen.classList.remove('is-active');
+        return;
+      }
+      const text = body.innerText.trim();
+      if (!text) return;
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'id-ID';
+      utterance.rate = 0.95;
+      utterance.pitch = 1;
+      utterance.volume = 1;
+      const voice = indonesiaVoice();
+      if (voice) utterance.voice = voice;
+      const finish = () => listen.classList.remove('is-active');
+      utterance.onend = finish;
+      utterance.onerror = finish;
+      window.speechSynthesis.speak(utterance);
+      listen.classList.add('is-active');
+    });
+    share?.addEventListener('click', async () => {
+      const data = { title: document.title, url: location.href };
+      if (navigator.share) await navigator.share(data).catch(() => {});
+      else if (navigator.clipboard) await navigator.clipboard.writeText(location.href);
+      share.classList.add('is-active');
+    });
+    save?.addEventListener('click', () => {
+      const next = save.getAttribute('aria-checked') !== 'true';
+      save.setAttribute('aria-checked', String(next));
+      save.classList.toggle('is-saved', next);
+      localStorage.setItem(storageKey, next ? '1' : '0');
+    });
+    comments?.addEventListener('click', () => {
+      if (!commentsPanel || !commentsLoader) return;
+      commentsLoader.click();
+    });
+  });
   const button = document.querySelector('.rp-menu-toggle');
   const nav = document.getElementById('rp-navigation');
   const overlay = document.querySelector('.rp-nav-overlay');

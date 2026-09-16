@@ -73,6 +73,61 @@ $headerMonth = $monthNames[(int) $now->format('n')];
 $headerDate = Text::_('TPL_ROJA_LOCATION') . ', ' . $headerDay . ', ' . $now->format('d') . ' ' . $headerMonth . ' ' . $now->format('Y');
 $headerTime = $now->format('H:i');
 $headerTimezone = Text::_('TPL_ROJA_TIMEZONE');
+$visitorTotal = 0;
+$visitorOnline = 0;
+
+try {
+  $database = Factory::getContainer()->get('DatabaseDriver');
+  $visitorTable = $database->quoteName('#__roja_visitors');
+  $database->setQuery(
+    'CREATE TABLE IF NOT EXISTS ' . $visitorTable . ' ('
+    . $database->quoteName('visitor_key') . ' VARCHAR(64) NOT NULL, '
+    . $database->quoteName('first_seen') . ' DATETIME NOT NULL, '
+    . $database->quoteName('last_seen') . ' DATETIME NOT NULL, '
+    . 'PRIMARY KEY (' . $database->quoteName('visitor_key') . ')'
+    . ') ENGINE=InnoDB DEFAULT CHARSET=utf8mb4'
+  )->execute();
+
+  $sessionId = (string) $app->getSession()->getId();
+  $visitorKey = hash('sha256', $sessionId ?: ($_SERVER['REMOTE_ADDR'] ?? 'anonymous'));
+  $nowUtc = gmdate('Y-m-d H:i:s');
+  $nowQuoted = $database->quote($nowUtc);
+  $existing = $database->setQuery(
+    $database->getQuery(true)
+      ->select('COUNT(*)')
+      ->from($visitorTable)
+      ->where($database->quoteName('visitor_key') . ' = ' . $database->quote($visitorKey))
+  )->loadResult();
+
+  if ((int) $existing > 0) {
+    $database->setQuery(
+      $database->getQuery(true)
+        ->update($visitorTable)
+        ->set($database->quoteName('last_seen') . ' = ' . $nowQuoted)
+        ->where($database->quoteName('visitor_key') . ' = ' . $database->quote($visitorKey))
+    )->execute();
+  } else {
+    $database->setQuery(
+      $database->getQuery(true)
+        ->insert($visitorTable)
+        ->columns([$database->quoteName('visitor_key'), $database->quoteName('first_seen'), $database->quoteName('last_seen')])
+        ->values(implode(',', [$database->quote($visitorKey), $nowQuoted, $nowQuoted]))
+    )->execute();
+  }
+
+  $onlineSince = gmdate('Y-m-d H:i:s', time() - 300);
+  $visitorTotal = (int) $database->setQuery(
+    $database->getQuery(true)->select('COUNT(*)')->from($visitorTable)
+  )->loadResult();
+  $visitorOnline = (int) $database->setQuery(
+    $database->getQuery(true)
+      ->select('COUNT(*)')
+      ->from($visitorTable)
+      ->where($database->quoteName('last_seen') . ' >= ' . $database->quote($onlineSince))
+  )->loadResult();
+} catch (Throwable $exception) {
+  // The visitor counter must never prevent the site from rendering.
+}
 
 $sitename = htmlspecialchars((string) $app->get('sitename'), ENT_QUOTES, 'UTF-8');
 $title = htmlspecialchars((string) $this->params->get('siteTitle', $sitename), ENT_QUOTES, 'UTF-8');
@@ -110,7 +165,7 @@ $this->setMetaData('viewport', 'width=device-width, initial-scale=1');
   <header class="rp-header<?php echo $sticky; ?>">
     <div class="rp-shell rp-masthead">
       <button class="rp-menu-toggle" type="button" aria-label="<?php echo Text::_('TPL_ROJA_OPEN_MENU'); ?>" aria-controls="rp-navigation" aria-expanded="false">
-        <span></span><span></span><span></span>
+        <span class="rp-menu-bar"></span><span class="rp-menu-bar"></span><span class="rp-menu-bar"></span>
       </button>
       <a class="rp-brand" href="<?php echo $this->baseurl; ?>/" aria-label="<?php echo $sitename; ?>">
         <?php echo $logo; ?>
@@ -126,7 +181,7 @@ $this->setMetaData('viewport', 'width=device-width, initial-scale=1');
       </div>
     </div>
     <div class="rp-navbar" id="rp-navigation" aria-label="<?php echo Text::_('TPL_ROJA_MAIN_NAVIGATION'); ?>">
-      <button class="rp-menu-close" type="button" aria-label="<?php echo Text::_('TPL_ROJA_CLOSE_MENU'); ?>"><?php echo Text::_('TPL_ROJA_CLOSE_MENU'); ?> <span aria-hidden="true">×</span></button>
+      <button class="rp-menu-close" type="button" aria-label="<?php echo Text::_('TPL_ROJA_CLOSE_MENU'); ?>"><?php echo Text::_('TPL_ROJA_CLOSE_MENU'); ?> ×</button>
       <div class="rp-mobile-search"></div>
       <div class="rp-shell"><jdoc:include type="modules" name="menu" style="none" /></div>
     </div>
@@ -186,7 +241,7 @@ $this->setMetaData('viewport', 'width=device-width, initial-scale=1');
       <div><jdoc:include type="modules" name="footer-menu-2" style="none" /></div>
       <div><jdoc:include type="modules" name="footer-social" style="none" /></div>
     </div>
-    <div class="rp-footer-bottom"><div class="rp-shell"><jdoc:include type="modules" name="footer-bottom" style="none" /><span>© <?php echo $now->format('Y'); ?> <?php echo $sitename; ?></span></div></div>
+    <div class="rp-footer-bottom"><div class="rp-shell"><jdoc:include type="modules" name="footer-bottom" style="none" /><span class="rp-copyright">© <?php echo $now->format('Y'); ?> <?php echo $sitename; ?></span><span class="rp-visitor-counter" aria-label="<?php echo htmlspecialchars(Text::_('TPL_ROJA_VISITOR_COUNTER'), ENT_QUOTES, 'UTF-8'); ?>"><svg class="rp-visitor-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm-7 8.5c.7-3.2 3.1-5 7-5s6.3 1.8 7 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><path d="M18.3 9.5a3.2 3.2 0 0 1 0 5.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><span class="rp-visitor-total"><?php echo $visitorTotal; ?> <?php echo Text::_('TPL_ROJA_VISITORS_TOTAL'); ?></span><span class="rp-visitor-online"><i aria-hidden="true"></i><?php echo $visitorOnline; ?> <?php echo Text::_('TPL_ROJA_VISITORS_ONLINE'); ?></span></span></div></div>
   </footer>
 
   <?php if ($this->params->get('backTop', 1)) : ?><a class="rp-backtop" href="#top" aria-label="<?php echo Text::_('TPL_ROJA_BACK_TO_TOP'); ?>">↑</a><?php endif; ?>
