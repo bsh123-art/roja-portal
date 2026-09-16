@@ -42,7 +42,8 @@ if ($isHome && !empty($defaultQuery)) {
 $wa->registerAndUseStyle('roja.portal', 'media/templates/site/roja_portal/css/template.css', ['version' => 'auto']);
 $wa->registerAndUseScript('roja.portal', 'media/templates/site/roja_portal/js/template.js', ['version' => 'auto'], ['defer' => true]);
 
-$now = Factory::getDate('now', Factory::getConfig()->get('offset'));
+$siteTimezone = new \DateTimeZone('Asia/Makassar');
+$now = new \DateTimeImmutable('now', $siteTimezone);
 $dayNames = [
     Text::_('TPL_ROJA_DAY_1'),
     Text::_('TPL_ROJA_DAY_2'),
@@ -69,9 +70,9 @@ $monthNames = [
 ];
 $headerDay = $dayNames[(int) $now->format('N') - 1];
 $headerMonth = $monthNames[(int) $now->format('n')];
-$headerDate = $headerDay . ', ' . $now->format('d') . ' ' . $headerMonth . ' ' . $now->format('Y');
+$headerDate = Text::_('TPL_ROJA_LOCATION') . ', ' . $headerDay . ', ' . $now->format('d') . ' ' . $headerMonth . ' ' . $now->format('Y');
 $headerTime = $now->format('H:i');
-$headerTimezone = $now->format('T');
+$headerTimezone = Text::_('TPL_ROJA_TIMEZONE');
 
 $sitename = htmlspecialchars((string) $app->get('sitename'), ENT_QUOTES, 'UTF-8');
 $title = htmlspecialchars((string) $this->params->get('siteTitle', $sitename), ENT_QUOTES, 'UTF-8');

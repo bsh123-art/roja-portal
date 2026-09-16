@@ -18,7 +18,7 @@ Template ini dirancang untuk portal berita/editorial dengan struktur seperti:
 - `extracted_tpl/` — sumber template Joomla yang sudah diubah
 - `constituents/` — file package instalasi module dan template
 - `pkg_roja_portal.xml` — manifest package
-- `pkg_roja_portal_v2_2_0.zip` — package utama yang siap diupload ke Joomla
+- `pkg_roja_portal_v2_2_10.zip` — package utama yang siap diupload ke Joomla
 
 ## File Penting
 
@@ -31,7 +31,7 @@ Template ini dirancang untuk portal berita/editorial dengan struktur seperti:
 1. Masuk ke administrator Joomla.
 2. Buka menu `Extensions > Manage > Install`.
 3. Pilih tab `Upload Package File`.
-4. Upload file `pkg_roja_portal_v2_2_0.zip`.
+4. Upload file `pkg_roja_portal_v2_2_10.zip`.
 5. Tunggu proses instalasi selesai.
 6. Buka `Extensions > Templates`.
 7. Aktifkan template `roja_portal` dan set sebagai default.
