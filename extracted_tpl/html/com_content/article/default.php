@@ -24,22 +24,28 @@ try {
 $escape = static fn ($value): string => htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 $database = Factory::getContainer()->get('DatabaseDriver');
 $currentArticle = $this->item;
-$findAdjacentTitle = static function (string $direction) use ($database, $currentArticle): string {
-    $current = $currentArticle;
-    $publishDate = (string) ($current->publish_up ?? '');
-    $currentId = (int) ($current->id ?? 0);
-    $categoryId = (int) ($current->catid ?? 0);
+$findAdjacentArticle = static function (string $direction) use ($database, $currentArticle): array {
+    $currentId = (int) ($currentArticle->id ?? 0);
+    $categoryId = (int) ($currentArticle->catid ?? 0);
+    $publishDate = trim((string) ($currentArticle->publish_up ?? ''));
 
-    if (!$publishDate || !$currentId) {
-        return '';
+    if (!$currentId || !$categoryId || !$publishDate) {
+        return ['link' => '', 'title' => ''];
     }
 
     $query = $database->getQuery(true)
-        ->select($database->quoteName('a.title'))
+        ->select([
+            $database->quoteName('a.id'),
+            $database->quoteName('a.title'),
+            $database->quoteName('a.alias'),
+            $database->quoteName('a.catid'),
+            $database->quoteName('a.publish_up'),
+        ])
         ->from($database->quoteName('#__content', 'a'))
         ->where($database->quoteName('a.state') . ' = 1')
         ->where($database->quoteName('a.id') . ' <> ' . $currentId)
-        ->where($database->quoteName('a.catid') . ' = ' . $categoryId);
+        ->where($database->quoteName('a.catid') . ' = ' . $categoryId)
+        ->where($database->quoteName('a.publish_up') . ' IS NOT NULL');
 
     if ($direction === 'previous') {
         $query->where('(' . $database->quoteName('a.publish_up') . ' < ' . $database->quote($publishDate)
@@ -53,19 +59,30 @@ $findAdjacentTitle = static function (string $direction) use ($database, $curren
             ->order($database->quoteName('a.publish_up') . ' ASC, ' . $database->quoteName('a.id') . ' ASC');
     }
 
-    return trim((string) $database->setQuery($query, 0, 1)->loadResult());
-};
-$articleNavigation = [];
-foreach (['previous' => ($this->item->prev ?? null), 'next' => ($this->item->next ?? null)] as $direction => $article) {
-    if (is_object($article)) {
-        $link = $article->link ?? '';
-        $title = $article->title ?? '';
-    } else {
-        $link = $article;
-        $title = $this->item->{$direction . '_title'} ?? '';
+    $item = $database->setQuery($query, 0, 1)->loadObject();
+    if (!$item) {
+        return ['link' => '', 'title' => ''];
     }
 
-    if (empty($link)) {
+    $link = 'index.php?option=com_content&view=article&id=' . (int) $item->id . '&catid=' . (int) $item->catid;
+    if (class_exists('\Joomla\Component\Content\Site\Helper\RouteHelper')) {
+        $link = \Joomla\CMS\Router\Route::_(
+            \Joomla\Component\Content\Site\Helper\RouteHelper::getArticleRoute((int) $item->id, (int) $item->catid)
+        );
+    }
+
+    return [
+        'link' => trim((string) $link),
+        'title' => trim((string) ($item->title ?? '')),
+    ];
+};
+$articleNavigation = [];
+foreach (['previous', 'next'] as $direction) {
+    $adjacent = $findAdjacentArticle($direction);
+    $link = trim((string) ($adjacent['link'] ?? ''));
+    $title = trim((string) ($adjacent['title'] ?? ''));
+
+    if ($link === '') {
         continue;
     }
 
@@ -78,8 +95,8 @@ foreach (['previous' => ($this->item->prev ?? null), 'next' => ($this->item->nex
     $actionText = $direction === 'previous'
         ? Text::_('TPL_ROJA_PREVIOUS_ACTION')
         : Text::_('TPL_ROJA_NEXT_ACTION');
-    $title = trim((string) $title) ?: $findAdjacentTitle($direction);
-    $title = $title ?: $label;
+
+    $title = $title !== '' ? $title : $label;
 
     $articleNavigation[] = '<a class="rp-article-nav-card ' . $direction . '" href="' . $escape($link) . '">'
         . '<span class="rp-article-nav-label">' . $escape($labelText) . '</span>'

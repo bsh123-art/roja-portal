@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="component" version="5.0" method="upgrade">
+    <name>COM_ROJAPORTAL</name>
+    <creationDate>2026-09-19</creationDate>
+    <author>ROJA Portal</author>
+    <authorEmail>admin@roja.local</authorEmail>
+    <authorUrl>https://roja.local</authorUrl>
+    <copyright>Copyright (C) 2026 ROJA Portal. All rights reserved.</copyright>
+    <license>GNU General Public License version 2 or later; see LICENSE.txt</license>
+    <version>1.0.0</version>
+    <description>ROJA Portal article navigation AJAX component.</description>
+
+    <files folder=".">
+        <filename>controller.php</filename>
+        <filename>rojaportal.php</filename>
+        <folder>controllers</folder>
+        <folder>helpers</folder>
+    </files>
+
+    <administration>
+        <files folder=".">
+            <filename>controller.php</filename>
+            <filename>rojaportal.php</filename>
+            <folder>controllers</folder>
+            <folder>helpers</folder>
+        </files>
+    </administration>
+</extension>

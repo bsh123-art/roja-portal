@@ -150,6 +150,8 @@ $this->setMetaData('viewport', 'width=device-width, initial-scale=1');
 <!doctype html>
 <html lang="<?php echo $this->language; ?>" dir="<?php echo $this->direction; ?>">
 <head>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6110804888936386"
+     crossorigin="anonymous"></script>
   <jdoc:include type="metas" />
   <jdoc:include type="styles" />
   <jdoc:include type="scripts" />
