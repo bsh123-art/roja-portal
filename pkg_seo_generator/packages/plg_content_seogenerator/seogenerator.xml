@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="plugin" group="content" method="upgrade">
+    <name>plg_content_seogenerator</name>
+    <version>1.0.0</version>
+    <creationDate>2026-09-23</creationDate>
+    <author>ROJA Portal</author>
+    <authorEmail>dev@roja.local</authorEmail>
+    <authorUrl>https://roja.example</authorUrl>
+    <copyright>Copyright (C) 2026 ROJA Portal</copyright>
+    <license>GPL-2.0-or-later</license>
+    <description>Automatically generates article keywords and meta descriptions using the article title and content.</description>
+
+    <files>
+        <filename plugin="seogenerator">seogenerator.php</filename>
+        <folder>src</folder>
+    </files>
+
+    <config>
+        <fields name="params">
+            <fieldset name="basic" label="SEO Generator">
+                <field name="enabled" type="radio" default="1" label="Enable SEO Generator" class="btn-group btn-group-yesno">
+                    <option value="1">JYES</option>
+                    <option value="0">JNO</option>
+                </field>
+                <field name="source" type="list" default="both" label="Keyword source">
+                    <option value="title">Title only</option>
+                    <option value="content">Content only</option>
+                    <option value="both">Title + content</option>
+                </field>
+                <field name="save_generated_metadata" type="radio" default="1" label="Save generated metadata on article save" class="btn-group btn-group-yesno">
+                    <option value="1">JYES</option>
+                    <option value="0">JNO</option>
+                </field>
+                <field name="generate_on_the_fly" type="radio" default="1" label="Generate metadata on the fly" class="btn-group btn-group-yesno">
+                    <option value="1">JYES</option>
+                    <option value="0">JNO</option>
+                </field>
+                <field name="blacklist_language" type="list" default="combined" label="Stopword blacklist language">
+                    <option value="english">English</option>
+                    <option value="german">German</option>
+                    <option value="combined">English + German</option>
+                    <option value="custom">Custom</option>
+                </field>
+                <field name="custom_blacklist" type="textarea" rows="8" cols="40" default="" label="Custom stopwords" description="One term per line or comma separated." />
+                <field name="min_word_length" type="number" default="4" label="Minimum keyword length" min="2" max="20" />
+                <field name="max_keywords" type="number" default="10" label="Maximum keywords" min="1" max="50" />
+                <field name="description_length" type="number" default="180" label="Meta description length" min="80" max="350" />
+                <field name="robots" type="text" default="index,follow" label="Default robots tag" />
+                <field name="google_verification" type="text" default="" label="Google Search Console verification key" />
+            </fieldset>
+        </fields>
+    </config>
+</extension>

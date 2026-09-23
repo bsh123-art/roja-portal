@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<extension type="package" method="upgrade">
+    <name>pkg_seo_generator</name>
+    <packagename>seo_generator</packagename>
+    <version>1.0.0</version>
+    <creationDate>2026-09-23</creationDate>
+    <author>ROJA Portal</author>
+    <authorEmail>dev@roja.local</authorEmail>
+    <authorUrl>https://roja.example</authorUrl>
+    <description>SEO Generator package for Joomla articles.</description>
+    <license>GPL-2.0-or-later</license>
+    <files folder="packages">
+        <file type="plugin" id="seogenerator" group="content">plg_content_seogenerator.zip</file>
+    </files>
+</extension>
